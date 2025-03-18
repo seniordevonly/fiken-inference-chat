@@ -1,0 +1,33 @@
+{
+  "name": "MIA Inference Chat UI",
+  "description": "A React-based chat interface for Heroku's Managed Inference and Agents service",
+  "keywords": ["react", "typescript", "chat", "heroku", "inference"],
+  "website": "https://www.heroku.com/inference",
+  "repository": "https://github.com/heroku-reference-apps/mia-inference-chat",
+  "success_url": "/",
+  "scripts": {
+    "postdeploy": "pnpm build"
+  },
+  "addons": [
+    {
+      "plan": "heroku-inference:claude-3-7-sonnet",
+      "as": "INFERENCE_3_7"
+    },
+    {
+      "plan": "heroku-inference:claude-3-5-sonnet-latest",
+      "as": "INFERENCE_3_5"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "stack": "heroku-24"
+}

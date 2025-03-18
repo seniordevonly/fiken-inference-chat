@@ -2,6 +2,9 @@
   "name": "mia-inference-chat",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "author": "Heroku DevRel <heroku-dev-advocacy@salesforce.com>",
   "scripts": {
     "dev": "dotenv -e .env -- concurrently \"npm run dev:client\" \"npm run dev:server\"",
     "dev:client": "npm run dev -w client",
@@ -9,18 +12,34 @@
     "build": "npm run build:client && npm run build:server",
     "build:client": "npm run build -w client",
     "build:server": "npm run build -w server",
-    "start": "node server/dist/server.js"
+    "start": "node server/dist/src/server.js",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,mdx}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,mdx}\"",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "check": "npm run format:check && npm run lint",
+    "test": "npm run test:client && npm run test:server",
+    "test:client": "npm test -w client",
+    "test:server": "npm test -w server"
   },
   "workspaces": [
     "client",
     "server"
   ],
   "devDependencies": {
-    "concurrently": "^8.2.2",
-    "dotenv-cli": "^8.0.0"
+    "@eslint/js": "^9.22.0",
+    "@typescript-eslint/eslint-plugin": "^8.26.1",
+    "@typescript-eslint/parser": "^8.26.1",
+    "concurrently": "^9.1.2",
+    "dotenv-cli": "^8.0.0",
+    "eslint": "^9.22.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "5.2.0",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3",
+    "prettier-eslint": "^16.3.0",
+    "typescript": "~5.8.2"
   },
-  "packageManager": "pnpm@10.6.4+sha512.da3d715bfd22a9a105e6e8088cfc7826699332ded60c423b14ec613a185f1602206702ff0fe4c438cb15c979081ce4cb02568e364b15174503a63c7a8e2a5f6c",
-  "dependencies": {
-    "ai": "^4.1.61"
-  }
+  "packageManager": "pnpm@10.6.4+sha512.da3d715bfd22a9a105e6e8088cfc7826699332ded60c423b14ec613a185f1602206702ff0fe4c438cb15c979081ce4cb02568e364b15174503a63c7a8e2a5f6c"
 }

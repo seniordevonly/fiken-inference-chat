@@ -9,11 +9,11 @@ interface Config {
 
 export const config: Config = {
   models: {
-    "claude-3-5-sonnet-latest": {
+    'claude-3-5-sonnet-latest': {
       INFERENCE_URL: process.env.INFERENCE_3_5_URL || 'https://localhost:3000/v1/chat',
       API_KEY: process.env.INFERENCE_3_5_KEY || 'inf-1234567890',
     },
-    "claude-3-7-sonnet": {
+    'claude-3-7-sonnet': {
       INFERENCE_URL: process.env.INFERENCE_3_7_URL || 'https://localhost:3000/v1/chat',
       API_KEY: process.env.INFERENCE_3_7_KEY || 'inf-1234567890',
     },

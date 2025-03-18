@@ -1,6 +1,6 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Chat from './pages/Chat';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import Layout from './components/Layout';
+import Chat from './pages/Chat';
 
 const router = createBrowserRouter([
   {
@@ -19,4 +19,4 @@ function App() {
   return <RouterProvider router={router} />;
 }
 
-export default App; 
+export default App;
