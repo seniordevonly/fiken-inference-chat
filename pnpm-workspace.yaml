@@ -2,5 +2,5 @@ packages:
   - client
   - server
 onlyBuiltDependencies:
-  - '@biomejs/biome'
+  - prettier
   - esbuild
