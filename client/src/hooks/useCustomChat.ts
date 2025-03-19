@@ -132,8 +132,8 @@ export function useCustomChat({ model, reasoning, historyLimit = 6 }: UseCustomC
         buffer = lines.pop() || '';
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
+          if (line.startsWith('data:')) {
+            const data = line.replace(/^data:\s?/, '');
 
             if (data === '[DONE]') continue;
 
