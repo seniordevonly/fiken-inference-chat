@@ -1,3 +1,4 @@
+import React from 'react';
 export type AgentType =
   | 'web_search'
   | 'web_browsing'

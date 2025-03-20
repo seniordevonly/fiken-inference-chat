@@ -188,12 +188,6 @@ export function useCustomChat({ model, reasoning, agents, historyLimit = 6 }: Us
               const toolCallsDelta =
                 chunk.choices[0]?.delta?.tool_calls || chunk.choices[0]?.message?.tool_calls;
 
-              console.log('Chunk received:', {
-                content: content !== null && content !== undefined ? 'present' : 'absent',
-                reasoning: reasoningDelta !== undefined ? 'present' : 'absent',
-                toolCalls: toolCallsDelta !== undefined ? toolCallsDelta : 'absent',
-              });
-
               if (content !== null && content !== undefined) {
                 if (accumulatedContent && !accumulatedContent.endsWith('\n')) {
                   accumulatedContent += '\n';
@@ -213,11 +207,6 @@ export function useCustomChat({ model, reasoning, agents, historyLimit = 6 }: Us
                     !accumulatedToolCalls.some(existingTool => existingTool.id === newTool.id)
                 );
                 accumulatedToolCalls = [...accumulatedToolCalls, ...newToolCalls];
-                console.log('Tool calls state:', {
-                  hasToolCalls,
-                  accumulatedToolCalls,
-                  newToolCallsCount: newToolCalls.length,
-                });
               }
 
               setMessages(prev => {
@@ -228,12 +217,6 @@ export function useCustomChat({ model, reasoning, agents, historyLimit = 6 }: Us
                   reasoning: reasoning ? { thinking: accumulatedReasoning } : undefined,
                   tool_calls: hasToolCalls ? accumulatedToolCalls : undefined,
                 };
-                console.log('Updating message:', {
-                  hasContent: !!lastMessage.content,
-                  hasReasoning: !!lastMessage.reasoning,
-                  hasToolCalls: !!lastMessage.tool_calls,
-                  toolCallsCount: lastMessage.tool_calls?.length,
-                });
                 newMessages[newMessages.length - 1] = lastMessage;
                 return newMessages;
               });

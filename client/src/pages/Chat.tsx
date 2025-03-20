@@ -221,7 +221,7 @@ const Chat: React.FC = () => {
                               let args;
                               try {
                                 args = JSON.parse(tool.function.arguments);
-                              } catch (e) {
+                              } catch (_e) {
                                 args = tool.function.arguments;
                               }
 
@@ -289,7 +289,7 @@ const Chat: React.FC = () => {
                       </div>
                     )}
                     <div className="text-gray-800">
-                      {/[*#\[\]_`]/.test(message.content) || message.content.includes('\n\n') ? (
+                      {/[*#[\]_`]/.test(message.content) || message.content.includes('\n\n') ? (
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm]}
                           rehypePlugins={[rehypeRaw]}
