@@ -3,11 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fastifyCors from '@fastify/cors';
 import fastifyStatic from '@fastify/static';
-import fastifyRateLimit, {
-  RateLimitOptions,
-  errorResponseBuilderContext,
-} from '@fastify/rate-limit';
-import { FastifyRequest } from 'fastify';
+import fastifyRateLimit from '@fastify/rate-limit';
 import Fastify from 'fastify';
 import { chatRoute } from './routes/chat.js';
 
@@ -28,17 +24,8 @@ fastify.register(fastifyCors, {
   maxAge: 86400, // 24 hours
 });
 
-// Register rate limiter
-fastify.register(fastifyRateLimit, {
-  max: 20, // Maximum number of requests within windowMs
-  timeWindow: '1 minute', // Time window for requests
-  errorResponseBuilder: (req: FastifyRequest, context: errorResponseBuilderContext) => ({
-    code: 429,
-    error: 'Too Many Requests',
-    expiresIn: context.ttl,
-    message: `Rate limit exceeded, retry in ${context.after}`,
-  }),
-} as RateLimitOptions);
+// Register rate limiter for specific routes
+fastify.register(fastifyRateLimit);
 
 // Serve static files from the React app build directory
 fastify.register(fastifyStatic, {
@@ -46,7 +33,7 @@ fastify.register(fastifyStatic, {
   prefix: '/',
 });
 
-// Register chat route
+// Register chat route with rate limiting
 fastify.register(chatRoute);
 
 // Run the server

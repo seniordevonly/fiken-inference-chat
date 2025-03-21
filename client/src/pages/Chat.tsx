@@ -1,20 +1,36 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { PaperAirplaneIcon, StopIcon } from '@heroicons/react/24/solid';
 import clsx from 'clsx';
 import ReactMarkdown, { Components } from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
+import { PaperAirplaneIcon, StopIcon } from '@heroicons/react/24/solid';
+import { RiToolsFill } from 'react-icons/ri';
 import { LoadingDots } from '@/components/LoadingDots';
 import { CodeBlock } from '@/components/CodeBlock';
 import { AgentToggle } from '@/components/AgentToggle';
 import { AGENTS } from '@/constants/agents';
-import type { AgentType } from '@/types/chat';
-import { type Message, type ModelType, useCustomChat } from '@/hooks/useCustomChat';
+import { useCustomChat } from '@/hooks/useCustomChat';
+import type { AgentType, ModelType, Message } from '@/types/chat';
 
 const MODELS: { id: ModelType; name: string }[] = [
   { id: 'claude-3-7-sonnet', name: 'Claude 3.7 Sonnet' },
   { id: 'claude-3-5-sonnet-latest', name: 'Claude 3.5 Sonnet' },
 ];
+
+const inferLanguageFromTool = (tool: { function: { name: string; arguments: string } }) => {
+  try {
+    // If no file extension, try to infer from tool name
+    const toolName = tool.function.name.toLowerCase();
+    if (toolName.includes('python')) return 'python';
+    if (toolName.includes('node')) return 'javascript';
+    if (toolName.includes('ruby')) return 'ruby';
+    if (toolName.includes('go')) return 'go';
+
+    return 'text';
+  } catch (_e) {
+    return 'text';
+  }
+};
 
 const markdownComponents: Components = {
   code: CodeBlock,
@@ -202,18 +218,53 @@ const Chat: React.FC = () => {
                 key={`${message.role}-${message.content.substring(0, 32)}`}
                 className={clsx('flex', {
                   'justify-end': message.role === 'user',
-                  'justify-start': message.role === 'assistant',
+                  'justify-start': message.role === 'assistant' || message.role === 'agent',
                 })}
               >
                 {message.role === 'assistant' ? (
-                  <div className="flex flex-col max-w-[85%] text-base">
+                  <div className="flex flex-col max-w-[90%] text-base">
+                    {message.reasoning && (
+                      <div className="mb-3">
+                        <button
+                          onClick={() => setUseReasoning(!useReasoning)}
+                          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+                        >
+                          Reasoning
+                        </button>
+                        <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeRaw]}
+                            components={markdownComponents}
+                          >
+                            {message.reasoning.thinking}
+                          </ReactMarkdown>
+                        </div>
+                      </div>
+                    )}
+                    <div className="text-gray-800 bg-white">
+                      {/[*#[\]_`]/.test(message.content) || message.content.includes('\n\n') ? (
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          rehypePlugins={[rehypeRaw]}
+                          components={markdownComponents}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                      ) : (
+                        <div className="whitespace-pre-wrap">{message.content}</div>
+                      )}
+                    </div>
+                  </div>
+                ) : message.role === 'agent' ? (
+                  <div className="flex flex-col max-w-[90%] text-base">
                     {message.tool_calls && message.tool_calls.length > 0 && (
                       <div className="mb-3">
                         <button
                           onClick={() => toggleToolCall(message.tool_calls![0].id)}
                           className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
                         >
-                          🔧 Tool Execution
+                          <RiToolsFill className="w-4 h-4" /> Tool Execution
                         </button>
                         {expandedToolCalls.has(message.tool_calls[0].id) && (
                           <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
@@ -258,7 +309,7 @@ const Chat: React.FC = () => {
                                         rehypePlugins={[rehypeRaw]}
                                         components={markdownComponents}
                                       >
-                                        {'```python\n' + codeContent + '\n```'}
+                                        {`\`\`\`${inferLanguageFromTool(tool)}\n${codeContent}\n\`\`\``}
                                       </ReactMarkdown>
                                     </div>
                                   )}
@@ -269,26 +320,7 @@ const Chat: React.FC = () => {
                         )}
                       </div>
                     )}
-                    {message.reasoning && (
-                      <div className="mb-3">
-                        <button
-                          onClick={() => setUseReasoning(!useReasoning)}
-                          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
-                        >
-                          Reasoning
-                        </button>
-                        <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                          <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            rehypePlugins={[rehypeRaw]}
-                            components={markdownComponents}
-                          >
-                            {message.reasoning.thinking}
-                          </ReactMarkdown>
-                        </div>
-                      </div>
-                    )}
-                    <div className="text-gray-800">
+                    <div className={clsx('text-gray-600 italic')}>
                       {/[*#[\]_`]/.test(message.content) || message.content.includes('\n\n') ? (
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm]}
@@ -303,7 +335,7 @@ const Chat: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="chat-message max-w-[85%] px-4 py-3 rounded-2xl bg-heroku-purple text-white">
+                  <div className="chat-message max-w-[90%] px-4 py-3 rounded-2xl bg-heroku-purple text-white">
                     {message.content}
                   </div>
                 )}

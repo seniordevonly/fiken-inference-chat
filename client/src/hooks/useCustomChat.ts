@@ -1,87 +1,5 @@
-import { AgentType } from '@/types/chat';
 import React, { useRef, useState } from 'react';
-
-export type ModelType = 'claude-3-7-sonnet' | 'claude-3-5-sonnet-latest';
-export type MessageRole = 'user' | 'assistant';
-
-export interface Message {
-  role: MessageRole;
-  content: string;
-  reasoning?: {
-    thinking: string;
-  };
-  tool_calls?: {
-    id: string;
-    type: string;
-    function: {
-      name: string;
-      arguments: string;
-    };
-  }[];
-}
-
-export interface ChatError {
-  message: string;
-  code?: string;
-}
-
-interface StreamChunk {
-  id: string;
-  object: string;
-  created: number;
-  model: string;
-  system_fingerprint: string;
-  choices: {
-    delta: {
-      content: string | null;
-      tool_calls:
-        | {
-            id: string;
-            type: string;
-            function: {
-              name: string;
-              arguments: string;
-            };
-          }[]
-        | null;
-      role: string;
-      reasoning?: {
-        thinking: string;
-      };
-    };
-    message: {
-      content: string;
-      tool_calls:
-        | {
-            id: string;
-            type: string;
-            function: {
-              name: string;
-              arguments: string;
-            };
-          }[]
-        | null;
-      role: string;
-      reasoning?: {
-        thinking: string;
-      };
-    };
-    finish_reason: string;
-    index: number;
-  }[];
-  usage?: {
-    prompt_tokens: number;
-    completion_tokens: number;
-    total_tokens: number;
-  };
-}
-
-interface UseCustomChatProps {
-  model: ModelType;
-  reasoning: boolean;
-  agents: AgentType[];
-  historyLimit?: number;
-}
+import { Message, ChatError, StreamChunk, UseCustomChatProps } from '@/types/chat';
 
 export function useCustomChat({ model, reasoning, agents, historyLimit = 6 }: UseCustomChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -121,7 +39,11 @@ export function useCustomChat({ model, reasoning, agents, historyLimit = 6 }: Us
     abortControllerRef.current = new AbortController();
 
     try {
-      const recentMessages = [...previousMessages, userMessage].slice(-historyLimit);
+      // Filter out agent messages when sending to server
+      const filteredMessages = [...previousMessages, userMessage].filter(
+        msg => msg.role !== 'agent' || msg.content.trim() !== ''
+      );
+      const recentMessages = filteredMessages.slice(-historyLimit);
 
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -150,18 +72,10 @@ export function useCustomChat({ model, reasoning, agents, historyLimit = 6 }: Us
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
+      let accumulatedToolMessage = '';
       let accumulatedContent = '';
       let accumulatedReasoning = '';
       let accumulatedToolCalls: NonNullable<Message['tool_calls']> = [];
-      let hasToolCalls = false;
-
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: '',
-        reasoning: reasoning ? { thinking: '' } : undefined,
-        tool_calls: undefined,
-      };
-      setMessages(prev => [...prev, assistantMessage]);
 
       let buffer = '';
 
@@ -188,38 +102,82 @@ export function useCustomChat({ model, reasoning, agents, historyLimit = 6 }: Us
               const toolCallsDelta =
                 chunk.choices[0]?.delta?.tool_calls || chunk.choices[0]?.message?.tool_calls;
 
-              if (content !== null && content !== undefined) {
-                if (accumulatedContent && !accumulatedContent.endsWith('\n')) {
-                  accumulatedContent += '\n';
-                }
-                accumulatedContent += content;
-              }
-
-              if (reasoningDelta !== undefined) {
-                accumulatedReasoning += reasoningDelta;
-              }
-
-              if (toolCallsDelta !== null && toolCallsDelta !== undefined) {
-                hasToolCalls = true;
-                // Only add new tool calls that aren't already in the accumulated list
+              // If this chunk has tool calls, accumulate them
+              if (toolCallsDelta != null) {
                 const newToolCalls = toolCallsDelta.filter(
                   newTool =>
                     !accumulatedToolCalls.some(existingTool => existingTool.id === newTool.id)
                 );
                 accumulatedToolCalls = [...accumulatedToolCalls, ...newToolCalls];
-              }
 
-              setMessages(prev => {
-                const newMessages = [...prev];
-                const lastMessage: Message = {
+                // If we also have content, it's part of the tool message
+                if (content != null) {
+                  // Add a space or newline if needed
+                  if (accumulatedToolMessage && content.trim()) {
+                    // If the last character is not a newline and the new content doesn't start with one
+                    if (!accumulatedToolMessage.endsWith('\n') && !content.startsWith('\n')) {
+                      // If the last message was a complete sentence, add a newline
+                      if (/[.!?]$/.test(accumulatedToolMessage.trim())) {
+                        accumulatedToolMessage += '\n';
+                      } else {
+                        // Otherwise just add a space
+                        accumulatedToolMessage += ' ';
+                      }
+                    }
+                  }
+                  accumulatedToolMessage += content;
+
+                  const agentMessage: Message = {
+                    role: 'agent',
+                    content: accumulatedToolMessage,
+                    is_tool_message: true,
+                    tool_calls: accumulatedToolCalls,
+                  };
+
+                  setMessages(prev => {
+                    const lastAgentIndex = prev.findLastIndex(
+                      msg => msg.role === 'agent' && msg.is_tool_message
+                    );
+
+                    // If we have an agent message and it's the last one (after any assistant), update it
+                    if (lastAgentIndex !== -1 && lastAgentIndex === prev.length - 1) {
+                      const newMessages = [...prev];
+                      newMessages[lastAgentIndex] = agentMessage;
+                      return newMessages;
+                    }
+
+                    // Otherwise append a new agent message
+                    return [...prev, agentMessage];
+                  });
+                }
+              } else if (content != null) {
+                // If no tool calls in this chunk, it's part of the assistant message
+                accumulatedContent += content;
+
+                const assistantMessage: Message = {
                   role: 'assistant',
                   content: accumulatedContent,
                   reasoning: reasoning ? { thinking: accumulatedReasoning } : undefined,
-                  tool_calls: hasToolCalls ? accumulatedToolCalls : undefined,
                 };
-                newMessages[newMessages.length - 1] = lastMessage;
-                return newMessages;
-              });
+
+                setMessages(prev => {
+                  const lastAssistantIndex = prev.findLastIndex(msg => msg.role === 'assistant');
+
+                  // If we have an assistant message and it's the last one, update it
+                  if (lastAssistantIndex !== -1 && lastAssistantIndex === prev.length - 1) {
+                    const newMessages = [...prev];
+                    newMessages[lastAssistantIndex] = assistantMessage;
+                    return newMessages;
+                  }
+
+                  // Otherwise append a new assistant message
+                  return [...prev, assistantMessage];
+                });
+              }
+
+              if (reasoningDelta != null) {
+                accumulatedReasoning += reasoningDelta;
+              }
             } catch (e) {
               console.error('Error parsing chunk:', e);
             }
