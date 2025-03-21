@@ -133,6 +133,7 @@ const Chat: React.FC = () => {
   const [selectedAgents, setSelectedAgents] = useState<AgentType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [expandedToolCalls, setExpandedToolCalls] = useState<Set<string>>(new Set());
+  const [expandedReasoning, setExpandedReasoning] = useState<boolean>(true);
 
   const toggleToolCall = (id: string) => {
     setExpandedToolCalls(prev => {
@@ -231,25 +232,27 @@ const Chat: React.FC = () => {
                     {message.reasoning && (
                       <div className="mb-3">
                         <button
-                          onClick={() => setUseReasoning(!useReasoning)}
+                          onClick={() => setExpandedReasoning(!expandedReasoning)}
                           className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
                         >
-                          {useReasoning ? (
+                          {expandedReasoning ? (
                             <ChevronDownIcon className="w-4 h-4" />
                           ) : (
                             <ChevronRightIcon className="w-4 h-4" />
                           )}
                           Reasoning
                         </button>
-                        <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                          <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            rehypePlugins={[rehypeRaw]}
-                            components={markdownComponents}
-                          >
-                            {message.reasoning.thinking}
-                          </ReactMarkdown>
-                        </div>
+                        {expandedReasoning && (
+                          <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm]}
+                              rehypePlugins={[rehypeRaw]}
+                              components={markdownComponents}
+                            >
+                              {message.reasoning.thinking}
+                            </ReactMarkdown>
+                          </div>
+                        )}
                       </div>
                     )}
                     <div className="text-gray-800 bg-white">
