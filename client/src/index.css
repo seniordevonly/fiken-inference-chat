@@ -9,30 +9,6 @@
 }
 
 @layer components {
-  .chat-message {
-    @apply p-4 rounded-lg mb-4 shadow-md transition-all duration-200 hover:shadow-lg;
-  }
-
-  .chat-message-user {
-    @apply bg-gradient-to-r from-heroku-purple to-purple-600 text-white;
-  }
-
-  .chat-message-assistant {
-    @apply bg-gradient-to-r from-heroku-light to-gray-100 text-heroku-black;
-  }
-
-  .btn {
-    @apply px-4 py-2 rounded-md font-medium transition-all duration-200 shadow-sm hover:shadow-md;
-  }
-
-  .btn-primary {
-    @apply bg-gradient-to-r from-heroku-purple to-purple-600 text-white hover:from-heroku-dark hover:to-purple-700;
-  }
-
-  .btn-secondary {
-    @apply bg-gradient-to-r from-gray-200 to-gray-300 text-heroku-black hover:from-gray-300 hover:to-gray-400;
-  }
-
   /* Loading animation */
   .loading-dots {
     @apply flex space-x-1 items-center;
