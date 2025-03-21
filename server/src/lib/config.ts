@@ -13,6 +13,7 @@ interface Config {
       };
       runtime_params?: {
         target_app_name?: string;
+        max_retries?: number;
       };
     };
   };
@@ -49,6 +50,7 @@ export const config: Config = {
       },
       runtime_params: {
         target_app_name: process.env.PYTHON_RUNNER || 'mia-demo-python-runner',
+        max_retries: +(process.env.RUNNER_MAX_RETRIES || 5),
       },
     },
     code_exec_ruby: {
@@ -58,6 +60,7 @@ export const config: Config = {
       },
       runtime_params: {
         target_app_name: process.env.RUBY_RUNNER || 'mia-demo-ruby-runner',
+        max_retries: +(process.env.RUNNER_MAX_RETRIES || 5),
       },
     },
     code_exec_node: {
@@ -67,6 +70,7 @@ export const config: Config = {
       },
       runtime_params: {
         target_app_name: process.env.NODE_RUNNER || 'mia-demo-node-runner',
+        max_retries: +(process.env.RUNNER_MAX_RETRIES || 5),
       },
     },
     code_exec_go: {
@@ -76,6 +80,7 @@ export const config: Config = {
       },
       runtime_params: {
         target_app_name: process.env.GO_RUNNER || 'mia-demo-go-runner',
+        max_retries: +(process.env.RUNNER_MAX_RETRIES || 5),
       },
     },
   },

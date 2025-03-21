@@ -1,9 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
-import clsx from 'clsx';
 import ReactMarkdown, { Components } from 'react-markdown';
+import clsx from 'clsx';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
-import { PaperAirplaneIcon, StopIcon } from '@heroicons/react/24/solid';
+import {
+  PaperAirplaneIcon,
+  StopIcon,
+  ChevronRightIcon,
+  ChevronDownIcon,
+} from '@heroicons/react/24/solid';
 import { RiToolsFill } from 'react-icons/ri';
 import { LoadingDots } from '@/components/LoadingDots';
 import { CodeBlock } from '@/components/CodeBlock';
@@ -229,6 +234,11 @@ const Chat: React.FC = () => {
                           onClick={() => setUseReasoning(!useReasoning)}
                           className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
                         >
+                          {useReasoning ? (
+                            <ChevronDownIcon className="w-4 h-4" />
+                          ) : (
+                            <ChevronRightIcon className="w-4 h-4" />
+                          )}
                           Reasoning
                         </button>
                         <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
@@ -264,6 +274,11 @@ const Chat: React.FC = () => {
                           onClick={() => toggleToolCall(message.tool_calls![0].id)}
                           className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
                         >
+                          {expandedToolCalls.has(message.tool_calls[0].id) ? (
+                            <ChevronDownIcon className="w-4 h-4" />
+                          ) : (
+                            <ChevronRightIcon className="w-4 h-4" />
+                          )}
                           <RiToolsFill className="w-4 h-4" /> Tool Execution
                         </button>
                         {expandedToolCalls.has(message.tool_calls[0].id) && (
@@ -385,7 +400,7 @@ const Chat: React.FC = () => {
                 type="text"
                 value={input}
                 onChange={handleInputChange}
-                placeholder="Send a message..."
+                placeholder="Ask me anything..."
                 className="flex-1 rounded-xl border-0 bg-gray-100 px-4 py-3 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-heroku-purple disabled:bg-gray-50 disabled:text-gray-500"
                 disabled={isLoading}
               />
@@ -403,7 +418,7 @@ const Chat: React.FC = () => {
                   type="submit"
                   disabled={!input.trim()}
                   className="rounded-xl bg-heroku-purple p-3 text-white hover:bg-heroku-dark focus:outline-none focus:ring-2 focus:ring-heroku-purple disabled:opacity-50"
-                  title="Ask me anything..."
+                  title="Submit your question"
                 >
                   <PaperAirplaneIcon className="h-5 w-5" />
                 </button>
