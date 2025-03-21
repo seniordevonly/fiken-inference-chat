@@ -1,5 +1,6 @@
 {
   "name": "mia-inference-chat",
+  "description": "Preview of Heroku Managed Inference and Agents features",
   "version": "1.0.0",
   "private": true,
   "type": "module",

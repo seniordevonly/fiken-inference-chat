@@ -112,7 +112,7 @@ export const chatRoute: FastifyPluginAsync = async fastify => {
 
         return response.body;
       } catch (error) {
-        request.log.error('Stream error:', error);
+        request.log.error(error, 'Stream error');
         return reply.status(500).send({ error: 'Internal server error' });
       }
     }

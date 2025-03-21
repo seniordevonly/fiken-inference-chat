@@ -1,151 +1,29 @@
 import React, { useEffect, useRef, useState } from 'react';
-import ReactMarkdown, { Components } from 'react-markdown';
+import ReactMarkdown from 'react-markdown';
 import clsx from 'clsx';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
-import {
-  PaperAirplaneIcon,
-  StopIcon,
-  ChevronRightIcon,
-  ChevronDownIcon,
-} from '@heroicons/react/24/solid';
-import { RiToolsFill } from 'react-icons/ri';
+import { PaperAirplaneIcon, StopIcon } from '@heroicons/react/24/solid';
+import { RiAiGenerate } from 'react-icons/ri';
 import { LoadingDots } from '@/components/LoadingDots';
-import { CodeBlock } from '@/components/CodeBlock';
 import { AgentToggle } from '@/components/AgentToggle';
 import { AGENTS } from '@/constants/agents';
 import { useCustomChat } from '@/hooks/useCustomChat';
 import type { AgentType, ModelType, Message } from '@/types/chat';
+import { CollapsibleReasoning } from '@/components/CollapsibleReasoning';
+import { CollapsibleToolExecution } from '@/components/CollapsibleToolExecution';
+import { markdownComponents } from '../constants/markdownComponents';
 
 const MODELS: { id: ModelType; name: string }[] = [
   { id: 'claude-3-7-sonnet', name: 'Claude 3.7 Sonnet' },
   { id: 'claude-3-5-sonnet-latest', name: 'Claude 3.5 Sonnet' },
 ];
 
-const inferLanguageFromTool = (tool: { function: { name: string; arguments: string } }) => {
-  try {
-    // If no file extension, try to infer from tool name
-    const toolName = tool.function.name.toLowerCase();
-    if (toolName.includes('python')) return 'python';
-    if (toolName.includes('node')) return 'javascript';
-    if (toolName.includes('ruby')) return 'ruby';
-    if (toolName.includes('go')) return 'go';
-
-    return 'text';
-  } catch (_e) {
-    return 'text';
-  }
-};
-
-const markdownComponents: Components = {
-  code: CodeBlock,
-  p: ({ children, ...props }: React.ComponentPropsWithoutRef<'p'>) => (
-    <p className="mb-3 last:mb-0 text-gray-800" {...props}>
-      {children}
-    </p>
-  ),
-  ul: ({ children, ...props }: React.ComponentPropsWithoutRef<'ul'>) => (
-    <ul className="list-disc list-inside mb-3 text-gray-800" {...props}>
-      {children}
-    </ul>
-  ),
-  ol: ({ children, ...props }: React.ComponentPropsWithoutRef<'ol'>) => (
-    <ol className="list-decimal list-inside mb-3 text-gray-800" {...props}>
-      {children}
-    </ol>
-  ),
-  li: ({ children, ...props }: React.ComponentPropsWithoutRef<'li'>) => (
-    <li className="mb-1 text-gray-800" {...props}>
-      {children}
-    </li>
-  ),
-  a: ({ href, children, ...props }: React.ComponentPropsWithoutRef<'a'>) => (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-blue-600 hover:underline"
-      {...props}
-    >
-      {children}
-    </a>
-  ),
-  blockquote: ({ children, ...props }: React.ComponentPropsWithoutRef<'blockquote'>) => (
-    <blockquote className="border-l-2 border-gray-300 pl-4 italic my-3 text-gray-700" {...props}>
-      {children}
-    </blockquote>
-  ),
-  h1: ({ children, ...props }: React.ComponentPropsWithoutRef<'h1'>) => (
-    <h1 className="text-xl font-semibold mb-3 text-gray-900" {...props}>
-      {children}
-    </h1>
-  ),
-  h2: ({ children, ...props }: React.ComponentPropsWithoutRef<'h2'>) => (
-    <h2 className="text-lg font-semibold mb-2 text-gray-900" {...props}>
-      {children}
-    </h2>
-  ),
-  h3: ({ children, ...props }: React.ComponentPropsWithoutRef<'h3'>) => (
-    <h3 className="text-base font-semibold mb-2 text-gray-900" {...props}>
-      {children}
-    </h3>
-  ),
-  table: ({ children, ...props }: React.ComponentPropsWithoutRef<'table'>) => (
-    <div className="my-4 overflow-x-auto">
-      <table className="min-w-full border-collapse text-sm" {...props}>
-        {children}
-      </table>
-    </div>
-  ),
-  thead: ({ children, ...props }: React.ComponentPropsWithoutRef<'thead'>) => (
-    <thead className="bg-gray-50" {...props}>
-      {children}
-    </thead>
-  ),
-  tbody: ({ children, ...props }: React.ComponentPropsWithoutRef<'tbody'>) => (
-    <tbody className="bg-white divide-y divide-gray-100" {...props}>
-      {children}
-    </tbody>
-  ),
-  tr: ({ children, ...props }: React.ComponentPropsWithoutRef<'tr'>) => (
-    <tr className="border-b border-gray-100 last:border-0" {...props}>
-      {children}
-    </tr>
-  ),
-  th: ({ children, ...props }: React.ComponentPropsWithoutRef<'th'>) => (
-    <th
-      className="px-4 py-3 text-left text-gray-700 font-semibold border-b border-gray-200"
-      {...props}
-    >
-      {children}
-    </th>
-  ),
-  td: ({ children, ...props }: React.ComponentPropsWithoutRef<'td'>) => (
-    <td className="px-4 py-3 text-gray-800" {...props}>
-      {children}
-    </td>
-  ),
-};
-
 const Chat: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState<ModelType>('claude-3-7-sonnet');
   const [useReasoning, setUseReasoning] = useState(false);
   const [selectedAgents, setSelectedAgents] = useState<AgentType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [expandedToolCalls, setExpandedToolCalls] = useState<Set<string>>(new Set());
-  const [expandedReasoning, setExpandedReasoning] = useState<boolean>(true);
-
-  const toggleToolCall = (id: string) => {
-    setExpandedToolCalls(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
-  };
 
   const {
     messages,
@@ -230,30 +108,7 @@ const Chat: React.FC = () => {
                 {message.role === 'assistant' ? (
                   <div className="flex flex-col max-w-[90%] text-base">
                     {message.reasoning && (
-                      <div className="mb-3">
-                        <button
-                          onClick={() => setExpandedReasoning(!expandedReasoning)}
-                          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
-                        >
-                          {expandedReasoning ? (
-                            <ChevronDownIcon className="w-4 h-4" />
-                          ) : (
-                            <ChevronRightIcon className="w-4 h-4" />
-                          )}
-                          Reasoning
-                        </button>
-                        {expandedReasoning && (
-                          <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                            <ReactMarkdown
-                              remarkPlugins={[remarkGfm]}
-                              rehypePlugins={[rehypeRaw]}
-                              components={markdownComponents}
-                            >
-                              {message.reasoning.thinking}
-                            </ReactMarkdown>
-                          </div>
-                        )}
-                      </div>
+                      <CollapsibleReasoning thinking={message.reasoning.thinking} expanded={true} />
                     )}
                     <div className="text-gray-800 bg-white">
                       {/[*#[\]_`]/.test(message.content) || message.content.includes('\n\n') ? (
@@ -271,86 +126,25 @@ const Chat: React.FC = () => {
                   </div>
                 ) : message.role === 'agent' ? (
                   <div className="flex flex-col max-w-[90%] text-base">
-                    {message.tool_calls && message.tool_calls.length > 0 && (
-                      <div className="mb-3">
-                        <button
-                          onClick={() => toggleToolCall(message.tool_calls![0].id)}
-                          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
-                        >
-                          {expandedToolCalls.has(message.tool_calls[0].id) ? (
-                            <ChevronDownIcon className="w-4 h-4" />
-                          ) : (
-                            <ChevronRightIcon className="w-4 h-4" />
-                          )}
-                          <RiToolsFill className="w-4 h-4" /> Tool Execution
-                        </button>
-                        {expandedToolCalls.has(message.tool_calls[0].id) && (
-                          <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                            {message.tool_calls.map((tool, index) => {
-                              let args;
-                              try {
-                                args = JSON.parse(tool.function.arguments);
-                              } catch (_e) {
-                                args = tool.function.arguments;
-                              }
-
-                              // Extract code from arguments if present
-                              const codeContent =
-                                typeof args === 'object' && args.code ? args.code : null;
-                              const otherArgs =
-                                typeof args === 'object' && args.code
-                                  ? { ...args, code: '[shown below]' }
-                                  : args;
-
-                              return (
-                                <div
-                                  key={tool.id}
-                                  className={index > 0 ? 'mt-4 pt-4 border-t border-gray-200' : ''}
-                                >
-                                  <div className="font-medium text-gray-700 mb-2">
-                                    {tool.function.name}
-                                  </div>
-                                  <div className="bg-white rounded border border-gray-200">
-                                    <pre className="p-3 overflow-x-auto whitespace-pre text-sm">
-                                      <code>
-                                        {typeof otherArgs === 'string'
-                                          ? otherArgs
-                                          : JSON.stringify(otherArgs, null, 2)}
-                                      </code>
-                                    </pre>
-                                  </div>
-                                  {codeContent && (
-                                    <div className="mt-3">
-                                      <div className="font-medium text-gray-700 mb-2">Code:</div>
-                                      <ReactMarkdown
-                                        remarkPlugins={[remarkGfm]}
-                                        rehypePlugins={[rehypeRaw]}
-                                        components={markdownComponents}
-                                      >
-                                        {`\`\`\`${inferLanguageFromTool(tool)}\n${codeContent}\n\`\`\``}
-                                      </ReactMarkdown>
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
+                    <div className="flex items-center gap-2">
+                      <RiAiGenerate className="w-4 h-4" />
+                      <div className={clsx('text-gray-600 italic')}>
+                        {/[*#[\]_`]/.test(message.content) || message.content.includes('\n\n') ? (
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeRaw]}
+                            components={markdownComponents}
+                          >
+                            {message.content}
+                          </ReactMarkdown>
+                        ) : (
+                          <div className="whitespace-pre-wrap">{message.content}</div>
                         )}
                       </div>
-                    )}
-                    <div className={clsx('text-gray-600 italic')}>
-                      {/[*#[\]_`]/.test(message.content) || message.content.includes('\n\n') ? (
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          rehypePlugins={[rehypeRaw]}
-                          components={markdownComponents}
-                        >
-                          {message.content}
-                        </ReactMarkdown>
-                      ) : (
-                        <div className="whitespace-pre-wrap">{message.content}</div>
-                      )}
                     </div>
+                    {message.tool_calls && message.tool_calls.length > 0 && (
+                      <CollapsibleToolExecution toolCalls={message.tool_calls} expanded={false} />
+                    )}
                   </div>
                 ) : (
                   <div className="chat-message max-w-[90%] px-4 py-3 rounded-2xl bg-heroku-purple text-white">

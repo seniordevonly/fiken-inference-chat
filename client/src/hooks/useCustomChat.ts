@@ -98,10 +98,16 @@ export function useCustomChat({ model, reasoning, agents, historyLimit = 6 }: Us
               const chunk: StreamChunk = JSON.parse(data);
               const content =
                 chunk.choices[0]?.delta?.content || chunk.choices[0]?.message?.content;
-              const reasoningDelta = chunk.choices[0]?.delta?.reasoning?.thinking;
+              const reasoningDelta =
+                chunk.choices[0]?.delta?.reasoning?.thinking ||
+                chunk.choices[0]?.message?.reasoning?.thinking;
               const toolCallsDelta =
                 chunk.choices[0]?.delta?.tool_calls || chunk.choices[0]?.message?.tool_calls;
 
+              // Initialize placeholder messages
+              const newMessages: Message[] = [];
+              let agentMessage: Message | null = null;
+              let assistantMessage: Message | null = null;
               // If this chunk has tool calls, accumulate them
               if (toolCallsDelta != null) {
                 const newToolCalls = toolCallsDelta.filter(
@@ -127,56 +133,72 @@ export function useCustomChat({ model, reasoning, agents, historyLimit = 6 }: Us
                   }
                   accumulatedToolMessage += content;
 
-                  const agentMessage: Message = {
+                  agentMessage = {
                     role: 'agent',
                     content: accumulatedToolMessage,
                     is_tool_message: true,
                     tool_calls: accumulatedToolCalls,
                   };
 
-                  setMessages(prev => {
-                    const lastAgentIndex = prev.findLastIndex(
-                      msg => msg.role === 'agent' && msg.is_tool_message
-                    );
-
-                    // If we have an agent message and it's the last one (after any assistant), update it
-                    if (lastAgentIndex !== -1 && lastAgentIndex === prev.length - 1) {
-                      const newMessages = [...prev];
-                      newMessages[lastAgentIndex] = agentMessage;
-                      return newMessages;
-                    }
-
-                    // Otherwise append a new agent message
-                    return [...prev, agentMessage];
-                  });
+                  newMessages.push(agentMessage);
                 }
-              } else if (content != null) {
-                // If no tool calls in this chunk, it's part of the assistant message
-                accumulatedContent += content;
+              }
 
-                const assistantMessage: Message = {
+              if (content != null) {
+                // If there's no agent message, this content is part of the assistant message
+                if (agentMessage === null) {
+                  accumulatedContent += content;
+                }
+
+                if (reasoningDelta != null) {
+                  accumulatedReasoning += reasoningDelta;
+                }
+
+                assistantMessage = {
                   role: 'assistant',
-                  content: accumulatedContent,
-                  reasoning: reasoning ? { thinking: accumulatedReasoning } : undefined,
+                  content: accumulatedContent || '',
+                  reasoning:
+                    accumulatedReasoning.trim() !== ''
+                      ? { thinking: accumulatedReasoning }
+                      : undefined,
                 };
 
+                newMessages.push(assistantMessage);
+              }
+
+              if (newMessages.length > 0) {
                 setMessages(prev => {
+                  const lastAgentIndex = prev.findLastIndex(
+                    msg => msg.role === 'agent' && msg.is_tool_message
+                  );
+
+                  // If we have an agent message and it's the last one (after any assistant), update it
+                  if (
+                    agentMessage != null &&
+                    lastAgentIndex !== -1 &&
+                    lastAgentIndex === prev.length - 1
+                  ) {
+                    const newMessages = [...prev];
+                    newMessages[lastAgentIndex] = agentMessage;
+                    return newMessages;
+                  }
+
                   const lastAssistantIndex = prev.findLastIndex(msg => msg.role === 'assistant');
 
                   // If we have an assistant message and it's the last one, update it
-                  if (lastAssistantIndex !== -1 && lastAssistantIndex === prev.length - 1) {
+                  if (
+                    assistantMessage != null &&
+                    lastAssistantIndex !== -1 &&
+                    lastAssistantIndex === prev.length - 1
+                  ) {
                     const newMessages = [...prev];
                     newMessages[lastAssistantIndex] = assistantMessage;
                     return newMessages;
                   }
 
-                  // Otherwise append a new assistant message
-                  return [...prev, assistantMessage];
+                  // Otherwise append all new messages
+                  return [...prev, ...newMessages];
                 });
-              }
-
-              if (reasoningDelta != null) {
-                accumulatedReasoning += reasoningDelta;
               }
             } catch (e) {
               console.error('Error parsing chunk:', e);
