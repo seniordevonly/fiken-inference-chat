@@ -18,7 +18,7 @@ export const AgentToggle: React.FC<AgentToggleProps> = ({
   const Icon = agent.icon;
   return (
     <button
-      type="button"
+      type='button'
       onClick={onToggle}
       disabled={disabled}
       className={clsx(
@@ -30,7 +30,7 @@ export const AgentToggle: React.FC<AgentToggleProps> = ({
         disabled && 'opacity-50 cursor-not-allowed'
       )}
     >
-      <Icon className="h-3.5 w-3.5" />
+      <Icon className='h-3.5 w-3.5' />
       {agent.name}
     </button>
   );

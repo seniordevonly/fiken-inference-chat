@@ -19,28 +19,28 @@ export const CodeBlock: React.FC<ComponentPropsWithoutRef<'code'>> = props => {
 
   return isInline ? (
     <code
-      className="bg-gray-100 dark:bg-gray-700 rounded px-1 py-0.5 text-gray-800 dark:text-gray-200"
+      className='bg-gray-100 dark:bg-gray-700 rounded px-1 py-0.5 text-gray-800 dark:text-gray-200'
       {...rest}
     >
       {children}
     </code>
   ) : (
-    <div className="relative group rounded-lg overflow-hidden">
-      <div className="absolute right-2 top-2 z-10">
+    <div className='relative group rounded-lg overflow-hidden'>
+      <div className='absolute right-2 top-2 z-10'>
         <CopyToClipboard text={String(children)} onCopy={handleCopy}>
           <button
-            className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+            className='p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors'
             title={isCopied ? 'Copied!' : 'Copy code'}
           >
             {isCopied ? (
-              <CheckIcon className="h-5 w-5 text-green-500" />
+              <CheckIcon className='h-5 w-5 text-green-500' />
             ) : (
-              <ClipboardIcon className="h-5 w-5 text-gray-400 group-hover:text-gray-300" />
+              <ClipboardIcon className='h-5 w-5 text-gray-400 group-hover:text-gray-300' />
             )}
           </button>
         </CopyToClipboard>
       </div>
-      <div className="!mt-0">
+      <div className='!mt-0'>
         <SyntaxHighlighter
           language={language || 'text'}
           style={atomOneDark}
