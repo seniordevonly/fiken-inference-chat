@@ -23,9 +23,9 @@ export const AgentToggle: React.FC<AgentToggleProps> = ({
       disabled={disabled}
       className={clsx(
         'flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-colors',
-        'border hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-heroku-purple',
+        'border hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-heroku-purple-30',
         isSelected
-          ? 'border-heroku-purple bg-heroku-purple/10 text-heroku-purple'
+          ? 'border-heroku-purple-30 bg-heroku-purple-95 text-heroku-purple-30'
           : 'border-gray-300 text-gray-700',
         disabled && 'opacity-50 cursor-not-allowed'
       )}
