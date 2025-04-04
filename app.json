@@ -1,5 +1,5 @@
 {
-  "name": "MIA Inference Chat UI",
+  "name": "MIA Chat UI",
   "description": "A React-based chat interface for Heroku's Managed Inference and Agents service",
   "keywords": ["react", "typescript", "chat", "heroku", "inference"],
   "website": "https://www.heroku.com/inference",
@@ -34,6 +34,10 @@
     {
       "plan": "heroku-inference:claude-3-5-sonnet-latest",
       "as": "INFERENCE_3_5"
+    },
+    {
+      "plan": "heroku-inference:stable-image-ultra",
+      "as": "DIFFUSION"
     }
   ],
   "formation": {

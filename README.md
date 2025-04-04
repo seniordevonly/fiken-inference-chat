@@ -93,6 +93,7 @@ A React-based chat interface for Heroku's Managed Inference and Agents service.
    ```bash
    heroku addons:create heroku-inference:claude-3-7-sonnet --as inference_3_7
    heroku addons:create heroku-inference:claude-3-5-sonnet-latest --as inference_3_5
+   heroku addons:create heroku-inference:stable-image-ultra --as diffusion
    ```
 
 1. Deploy to Heroku:
