@@ -1,4 +1,5 @@
 import { ModelConfig } from '../types/shared.js';
+import { createMcpClient, HttpMcpClient } from './httpMcpClient.js';
 
 interface Config {
   system_prompt: string;
@@ -83,4 +84,17 @@ export const getTool = (tool: string) => {
 
 export const getModel = (model: string) => {
   return config.models[model];
+};
+
+// MCP client instance for fiken-mcp server
+let fikenMcpClient: HttpMcpClient | null = null;
+
+export const getFikenMcpClient = (): HttpMcpClient | null => {
+  if (!fikenMcpClient && process.env.FIKEN_MCP_URL) {
+    fikenMcpClient = createMcpClient(
+      process.env.FIKEN_MCP_URL,
+      process.env.FIKEN_MCP_KEY
+    );
+  }
+  return fikenMcpClient;
 };
