@@ -9,6 +9,6 @@ export const AGENTS: Agent[] = [
   { id: 'code_exec_node', name: 'Node.js', icon: SiNodedotjs },
   { id: 'code_exec_ruby', name: 'Ruby', icon: SiRuby },
   { id: 'code_exec_go', name: 'Go', icon: SiGo },
-  // Add your fiken-mcp tools here
-  { id: 'fiken_tool_1', name: 'Fiken Tool 1', icon: RiToolsFill },
+  // Fiken MCP tools (managed by Heroku)
+  { id: 'fiken_purchases', name: 'Fiken Purchases', icon: RiToolsFill },
 ];

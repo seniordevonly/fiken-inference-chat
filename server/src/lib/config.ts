@@ -62,13 +62,10 @@ export const config: Config = {
       type: 'heroku_tool',
       name: 'code_exec_go',
     },
-    // Add your fiken-mcp tools here
-    fiken_tool_1: {
-      type: 'mcp_tool',
-      name: 'fiken_tool_1',
-      runtime_params: {
-        mcp_server_url: process.env.FIKEN_MCP_URL,
-      },
+    // Fiken MCP tools (managed by Heroku)
+    fiken_purchases: {
+      type: 'heroku_tool',
+      name: 'fiken_purchases',
     },
     // Add more fiken-mcp tools as needed
   },

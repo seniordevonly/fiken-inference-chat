@@ -6,7 +6,7 @@ export type AgentType =
   | 'code_exec_node'
   | 'code_exec_ruby'
   | 'code_exec_go'
-  | 'fiken_tool_1';
+  | 'fiken_purchases';
 
 export type Agent = {
   id: AgentType;

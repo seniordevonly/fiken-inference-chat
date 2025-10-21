@@ -52,46 +52,15 @@ export const chatRoute: FastifyPluginAsync = async fastify => {
       };
 
       if (hasAgents) {
-        const mcpTools: string[] = [];
-        const herokuTools: { type: string; name: string }[] = [];
-
-        for (const agent of agents) {
-          const tool = getTool(agent);
-          if (tool?.type === 'mcp_tool') {
-            mcpTools.push(agent);
-            // For MCP tools, we'll handle them separately
-            fastify.log.info(`MCP tool detected: ${agent}`);
-          } else if (tool) {
-            herokuTools.push(tool);
-          }
-        }
-
-        // If we have MCP tools, we need to handle the request differently
-        if (mcpTools.length > 0) {
-          fastify.log.info(`Processing ${mcpTools.length} MCP tools: ${mcpTools.join(', ')}`);
-          
-          const mcpClient = getFikenMcpClient();
-          if (mcpClient) {
-            try {
-              // Test connection to MCP server
-              const isAlive = await mcpClient.ping();
-              if (isAlive) {
-                fastify.log.info('Fiken MCP server is accessible');
-                // List available tools
-                const availableTools = await mcpClient.listTools();
-                fastify.log.info(`Available MCP tools: ${availableTools.map(t => t.name).join(', ')}`);
-              } else {
-                fastify.log.warn('Fiken MCP server is not accessible');
-              }
-            } catch (error) {
-              fastify.log.error('Failed to communicate with Fiken MCP server:', error);
+        body.tools = agents
+          .map(agent => {
+            const tool = getTool(agent);
+            if (tool) {
+              fastify.log.info(`Including tool: ${agent} (${tool.type})`);
             }
-          } else {
-            fastify.log.warn('Fiken MCP client not configured (missing FIKEN_MCP_URL)');
-          }
-        }
-
-        body.tools = herokuTools;
+            return tool;
+          })
+          .filter((tool): tool is { type: string; name: string } => tool !== undefined);
       } else {
         body.stream = true;
         if (model === 'claude-3-7-sonnet' && reasoning) {
