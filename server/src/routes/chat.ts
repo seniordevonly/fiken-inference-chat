@@ -54,7 +54,14 @@ export const chatRoute: FastifyPluginAsync = async fastify => {
       if (hasAgents) {
         body.tools = agents
           .map(agent => {
-            return getTool(agent);
+            const tool = getTool(agent);
+            if (tool?.type === 'mcp_tool') {
+              // For MCP tools, we need to handle them differently
+              // This would require implementing MCP client logic
+              fastify.log.warn(`MCP tool ${agent} not yet fully implemented`);
+              return undefined;
+            }
+            return tool;
           })
           .filter((tool): tool is { type: string; name: string } => tool !== undefined);
       } else {

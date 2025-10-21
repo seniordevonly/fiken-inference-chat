@@ -12,6 +12,7 @@ interface Config {
       runtime_params?: {
         target_app_name?: string;
         max_retries?: number;
+        mcp_server_url?: string;
       };
     };
   };
@@ -60,6 +61,15 @@ export const config: Config = {
       type: 'heroku_tool',
       name: 'code_exec_go',
     },
+    // Add your fiken-mcp tools here
+    fiken_tool_1: {
+      type: 'mcp_tool',
+      name: 'fiken_tool_1',
+      runtime_params: {
+        mcp_server_url: process.env.FIKEN_MCP_URL,
+      },
+    },
+    // Add more fiken-mcp tools as needed
   },
 };
 
