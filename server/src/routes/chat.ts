@@ -57,10 +57,19 @@ export const chatRoute: FastifyPluginAsync = async fastify => {
             const tool = getTool(agent);
             if (tool) {
               fastify.log.info(`Including tool: ${agent} (${tool.type})`);
+              // Include runtime_params if they exist
+              const toolWithParams: any = {
+                type: tool.type,
+                name: tool.name,
+              };
+              if (tool.runtime_params) {
+                toolWithParams.runtime_params = tool.runtime_params;
+              }
+              return toolWithParams;
             }
-            return tool;
+            return undefined;
           })
-          .filter((tool): tool is { type: string; name: string } => tool !== undefined);
+          .filter((tool): tool is { type: string; name: string; runtime_params?: any } => tool !== undefined);
       } else {
         body.stream = true;
         if (model === 'claude-3-7-sonnet' && reasoning) {

@@ -20,6 +20,10 @@ export interface ChatRequestBody {
   tools?: {
     type: string;
     name: string;
+    runtime_params?: {
+      target_app_name?: string;
+      max_retries?: number;
+    };
   }[];
   extended_thinking?: {
     enabled: boolean;

@@ -66,6 +66,9 @@ export const config: Config = {
     fiken_get_purchases: {
       type: 'heroku_tool',
       name: 'fiken_get_purchases',
+      runtime_params: {
+        target_app_name: process.env.FIKEN_MCP_APP_NAME || 'fiken-mcp',
+      },
     },
     // Add more fiken-mcp tools as needed
   },
