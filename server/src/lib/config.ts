@@ -63,9 +63,9 @@ export const config: Config = {
       name: 'code_exec_go',
     },
     // Fiken MCP tools (managed by Heroku)
-    fiken_purchases: {
+    fiken_get_purchases: {
       type: 'heroku_tool',
-      name: 'fiken_purchases',
+      name: 'fiken_get_purchases',
     },
     // Add more fiken-mcp tools as needed
   },

@@ -73,6 +73,15 @@ export const chatRoute: FastifyPluginAsync = async fastify => {
       }
 
       try {
+        // Log the request details for debugging
+        fastify.log.info({
+          url: hasAgents ? agentsUrl : inferenceUrl,
+          hasAgents,
+          toolsCount: body.tools?.length || 0,
+          tools: body.tools?.map(t => t.name) || [],
+          model: body.model
+        }, 'Sending request to Heroku');
+
         const response = await fetch(hasAgents ? agentsUrl : inferenceUrl, {
           method: 'POST',
           headers: {
@@ -84,10 +93,17 @@ export const chatRoute: FastifyPluginAsync = async fastify => {
 
         if (!response.ok) {
           const errorData = await response.json();
-          fastify.log.error(errorData, 'Error from model');
+          fastify.log.error({
+            status: response.status,
+            statusText: response.statusText,
+            errorData,
+            requestBody: body
+          }, 'Error response from Heroku');
+          
           return reply.status(response.status).send({
             error: 'Failed to fetch from model',
-            details: errorData.error.message,
+            details: errorData.error?.message || errorData.message || JSON.stringify(errorData),
+            status: response.status
           });
         }
 
