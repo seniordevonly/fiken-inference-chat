@@ -57,15 +57,18 @@ export const chatRoute: FastifyPluginAsync = async fastify => {
             const tool = getTool(agent);
             if (tool) {
               fastify.log.info(`Including tool: ${agent} (${tool.type})`);
-              // Include runtime_params if they exist
-              const toolWithParams: any = {
+              // Build tool object based on type
+              const toolObj: any = {
                 type: tool.type,
                 name: tool.name,
               };
-              if (tool.runtime_params) {
-                toolWithParams.runtime_params = tool.runtime_params;
+              
+              // Only add runtime_params for heroku_tool types
+              if (tool.type === 'heroku_tool' && tool.runtime_params) {
+                toolObj.runtime_params = tool.runtime_params;
               }
-              return toolWithParams;
+              
+              return toolObj;
             }
             return undefined;
           })
