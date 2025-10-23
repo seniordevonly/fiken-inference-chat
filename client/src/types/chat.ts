@@ -6,7 +6,8 @@ export type AgentType =
   | 'code_exec_node'
   | 'code_exec_ruby'
   | 'code_exec_go'
-  | 'fiken_get_purchases';
+  | 'fiken_get_purchases'
+  | 'fiken_get_purchase_draft';
 
 export type Agent = {
   id: AgentType;

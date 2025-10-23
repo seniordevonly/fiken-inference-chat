@@ -166,7 +166,7 @@ const Chat: React.FC = () => {
           >
             {messages.length === 0 && !isLoading && (
               <div className='text-center text-gray-500 w-full'>
-                Start a conversation with MIA by asking a question below.
+                Start a conversation with Fiken by asking a question below.
               </div>
             )}
             {messages.map((message: Message) => (
