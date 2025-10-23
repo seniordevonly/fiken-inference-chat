@@ -71,6 +71,10 @@ export const config: Config = {
       type: 'mcp',
       name: 'fiken_get_purchase_draft',
     },
+    fiken_get_invoices: {
+      type: 'mcp',
+      name: 'fiken_get_invoices',
+    },
     // Add more fiken-mcp tools as needed
   },
 };

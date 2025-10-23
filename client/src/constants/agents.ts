@@ -12,4 +12,5 @@ export const AGENTS: Agent[] = [
   // Fiken MCP tools (managed by Heroku)
   { id: 'fiken_get_purchases', name: 'Fiken Get Purchases', icon: RiToolsFill },
   { id: 'fiken_get_purchase_draft', name: 'Fiken Get Draft Purchase with id', icon: RiToolsFill },
+  { id: 'fiken_get_invoices', name: 'Fiken Get Invoices', icon: RiToolsFill },
 ];
