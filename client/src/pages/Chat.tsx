@@ -35,7 +35,7 @@ const ASPECT_RATIOS = [
 ];
 
 const Chat: React.FC = () => {
-  const [selectedModel, setSelectedModel] = useState<ModelType>('claude-3-7-sonnet');
+  const [selectedModel, setSelectedModel] = useState<ModelType>('claude-4-5-haiku');
   const [useReasoning, setUseReasoning] = useState(false);
   const [selectedAgents, setSelectedAgents] = useState<AgentType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
