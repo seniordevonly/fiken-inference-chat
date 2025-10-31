@@ -32,6 +32,10 @@ export const config: Config = {
       INFERENCE_URL: process.env.INFERENCE_3_7_URL || 'https://us.inference.heroku.com',
       API_KEY: process.env.INFERENCE_3_7_KEY || 'inf-1234567890',
     },
+    'claude-4-5-haiku': {
+      INFERENCE_URL: process.env.INFERENCE_4_5_HAIKU_URL || 'https://us.inference.heroku.com',
+      API_KEY: process.env.INFERENCE_4_5_HAIKU_KEY || 'inf-1234567890',
+    },
     'stable-image-ultra': {
       DIFFUSION_URL: process.env.DIFFUSION_URL || 'https://us.inference.heroku.com',
       API_KEY: process.env.DIFFUSION_KEY || 'inf-1234567890',

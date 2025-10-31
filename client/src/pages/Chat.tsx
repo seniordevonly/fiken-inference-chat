@@ -16,6 +16,7 @@ import { CollapsibleToolExecution } from '@/components/CollapsibleToolExecution'
 import { markdownComponents } from '../constants/markdownComponents';
 
 const MODELS: { id: ModelType; name: string }[] = [
+  { id: 'claude-4-5-haiku', name: 'Claude 4.5 Haiku' },
   { id: 'claude-3-7-sonnet', name: 'Claude 3.7 Sonnet' },
   { id: 'claude-3-5-sonnet-latest', name: 'Claude 3.5 Sonnet' },
   { id: 'stable-image-ultra', name: 'Stable Image Ultra' },

@@ -15,7 +15,7 @@ export type Agent = {
   icon: React.ElementType;
 };
 
-export type ModelType = 'claude-3-7-sonnet' | 'claude-3-5-sonnet-latest' | 'stable-image-ultra';
+export type ModelType = 'claude-4-5-haiku' | 'claude-3-7-sonnet' | 'claude-3-5-sonnet-latest' | 'stable-image-ultra';
 
 interface BaseImageRequest {
   prompt: string;
