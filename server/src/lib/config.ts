@@ -67,19 +67,24 @@ export const config: Config = {
       name: 'code_exec_go',
     },
     // Fiken MCP tools (managed by Heroku)
-    fiken_get_purchases: {
-      type: 'mcp',
-      name: 'fiken_get_purchases',
-    },
-    fiken_get_purchase_draft: {
-      type: 'mcp',
-      name: 'fiken_get_purchase_draft',
-    },
-    fiken_get_invoices: {
-      type: 'mcp',
-      name: 'fiken_get_invoices',
-    },
-    // Add more fiken-mcp tools as needed
+    fiken_status: { type: 'mcp', name: 'fiken_status' },
+    fiken_configure: { type: 'mcp', name: 'fiken_configure' },
+    fiken_get_purchases: { type: 'mcp', name: 'fiken_get_purchases' },
+    fiken_create_purchase: { type: 'mcp', name: 'fiken_create_purchase' },
+    fiken_get_purchase: { type: 'mcp', name: 'fiken_get_purchase' },
+    fiken_delete_purchase: { type: 'mcp', name: 'fiken_delete_purchase' },
+    fiken_create_purchase_draft: { type: 'mcp', name: 'fiken_create_purchase_draft' },
+    fiken_get_purchase_draft: { type: 'mcp', name: 'fiken_get_purchase_draft' },
+    fiken_get_purchase_draft_attachments: { type: 'mcp', name: 'fiken_get_purchase_draft_attachments' },
+    fiken_add_attachment_to_purchase_draft: { type: 'mcp', name: 'fiken_add_attachment_to_purchase_draft' },
+    fiken_create_purchase_payment: { type: 'mcp', name: 'fiken_create_purchase_payment' },
+    fiken_get_invoices: { type: 'mcp', name: 'fiken_get_invoices' },
+    fiken_create_invoice: { type: 'mcp', name: 'fiken_create_invoice' },
+    fiken_get_invoice: { type: 'mcp', name: 'fiken_get_invoice' },
+    fiken_update_invoice: { type: 'mcp', name: 'fiken_update_invoice' },
+    fiken_send_invoice: { type: 'mcp', name: 'fiken_send_invoice' },
+    fiken_get_invoice_drafts: { type: 'mcp', name: 'fiken_get_invoice_drafts' },
+    fiken_create_invoice_draft: { type: 'mcp', name: 'fiken_create_invoice_draft' },
   },
 };
 

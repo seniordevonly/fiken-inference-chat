@@ -6,9 +6,25 @@ export type AgentType =
   | 'code_exec_node'
   | 'code_exec_ruby'
   | 'code_exec_go'
+  // Fiken tools
+  | 'fiken_status'
+  | 'fiken_configure'
   | 'fiken_get_purchases'
+  | 'fiken_create_purchase'
+  | 'fiken_get_purchase'
+  | 'fiken_delete_purchase'
+  | 'fiken_create_purchase_draft'
   | 'fiken_get_purchase_draft'
-  | 'fiken_get_invoices';
+  | 'fiken_get_purchase_draft_attachments'
+  | 'fiken_add_attachment_to_purchase_draft'
+  | 'fiken_create_purchase_payment'
+  | 'fiken_get_invoices'
+  | 'fiken_create_invoice'
+  | 'fiken_get_invoice'
+  | 'fiken_update_invoice'
+  | 'fiken_send_invoice'
+  | 'fiken_get_invoice_drafts'
+  | 'fiken_create_invoice_draft';
 
 export type Agent = {
   id: AgentType;

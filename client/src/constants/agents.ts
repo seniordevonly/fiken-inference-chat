@@ -1,15 +1,42 @@
 import { RiToolsFill } from 'react-icons/ri';
 import type { Agent } from '@/types/chat';
 
+export const GROUPED_AGENTS: { title: string; agents: Agent[] }[] = [
+  {
+    title: 'Status & Setup',
+    agents: [
+      { id: 'fiken_status', name: 'Fiken: Check MCP Status', icon: RiToolsFill },
+      { id: 'fiken_configure', name: 'Fiken: Configure Credentials', icon: RiToolsFill },
+    ],
+  },
+  {
+    title: 'Purchases',
+    agents: [
+      { id: 'fiken_get_purchases', name: 'List Purchases', icon: RiToolsFill },
+      { id: 'fiken_create_purchase', name: 'Create Purchase', icon: RiToolsFill },
+      { id: 'fiken_get_purchase', name: 'Get Purchase by ID', icon: RiToolsFill },
+      { id: 'fiken_delete_purchase', name: 'Delete Purchase', icon: RiToolsFill },
+      { id: 'fiken_create_purchase_draft', name: 'Create Purchase Draft', icon: RiToolsFill },
+      { id: 'fiken_get_purchase_draft', name: 'Get Purchase Draft by ID', icon: RiToolsFill },
+      { id: 'fiken_get_purchase_draft_attachments', name: 'List Draft Attachments', icon: RiToolsFill },
+      { id: 'fiken_add_attachment_to_purchase_draft', name: 'Add Attachment to Draft', icon: RiToolsFill },
+      { id: 'fiken_create_purchase_payment', name: 'Record Purchase Payment', icon: RiToolsFill },
+    ],
+  },
+  {
+    title: 'Invoices',
+    agents: [
+      { id: 'fiken_get_invoices', name: 'List Invoices', icon: RiToolsFill },
+      { id: 'fiken_create_invoice', name: 'Create Invoice', icon: RiToolsFill },
+      { id: 'fiken_get_invoice', name: 'Get Invoice by ID', icon: RiToolsFill },
+      { id: 'fiken_update_invoice', name: 'Update Invoice', icon: RiToolsFill },
+      { id: 'fiken_send_invoice', name: 'Send Invoice', icon: RiToolsFill },
+      { id: 'fiken_get_invoice_drafts', name: 'List Invoice Drafts', icon: RiToolsFill },
+      { id: 'fiken_create_invoice_draft', name: 'Create Invoice Draft', icon: RiToolsFill },
+    ],
+  },
+];
+
 export const AGENTS: Agent[] = [
-  //{ id: 'html_to_markdown', name: 'HTML to Markdown', icon: SiHtml5 },
-  //{ id: 'pdf_to_markdown', name: 'PDF to Markdown', icon: SiAdobeacrobatreader },
-  //{ id: 'code_exec_python', name: 'Python', icon: SiPython },
-  //{ id: 'code_exec_node', name: 'Node.js', icon: SiNodedotjs },
-  //{ id: 'code_exec_ruby', name: 'Ruby', icon: SiRuby },
-  //{ id: 'code_exec_go', name: 'Go', icon: SiGo },
-  // Fiken MCP tools (managed by Heroku)
-  { id: 'fiken_get_purchases', name: 'Fiken Get Purchases', icon: RiToolsFill },
-  { id: 'fiken_get_purchase_draft', name: 'Fiken Get Draft Purchase with id', icon: RiToolsFill },
-  { id: 'fiken_get_invoices', name: 'Fiken Get Invoices', icon: RiToolsFill },
+  ...GROUPED_AGENTS.flatMap(s => s.agents),
 ];

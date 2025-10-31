@@ -7,7 +7,7 @@ import { PaperAirplaneIcon, StopIcon } from '@heroicons/react/24/solid';
 import { RiAiGenerate } from 'react-icons/ri';
 import { LoadingDots } from '@/components/LoadingDots';
 import { AgentToggle } from '@/components/AgentToggle';
-import { AGENTS } from '@/constants/agents';
+import { GROUPED_AGENTS } from '@/constants/agents';
 import { useCustomChat } from '@/hooks/useCustomChat';
 import { useImageGeneration } from '@/hooks/useImageGeneration';
 import type { AgentType, ModelType, Message, ImageGenerationParams } from '@/types/chat';
@@ -305,20 +305,29 @@ const Chat: React.FC = () => {
               <div className='flex flex-col gap-2'>
                 {selectedModel !== 'stable-image-ultra' && (
                   <div className='flex flex-wrap gap-1.5 justify-end'>
-                    {AGENTS.map(agent => (
-                      <AgentToggle
-                        key={agent.id}
-                        agent={agent}
-                        isSelected={selectedAgents.includes(agent.id)}
-                        onToggle={() => {
-                          setSelectedAgents(prev =>
-                            prev.includes(agent.id)
-                              ? prev.filter(id => id !== agent.id)
-                              : [...prev, agent.id]
-                          );
-                        }}
-                        disabled={isLoading}
-                      />
+                    {GROUPED_AGENTS.map(section => (
+                      <div key={section.title} className='w-full'>
+                        <div className='text-[10px] uppercase tracking-wide text-gray-400 font-semibold mb-1 text-right'>
+                          {section.title}
+                        </div>
+                        <div className='flex flex-wrap gap-1.5 justify-end'>
+                          {section.agents.map(agent => (
+                            <AgentToggle
+                              key={agent.id}
+                              agent={agent}
+                              isSelected={selectedAgents.includes(agent.id)}
+                              onToggle={() => {
+                                setSelectedAgents(prev =>
+                                  prev.includes(agent.id)
+                                    ? prev.filter(id => id !== agent.id)
+                                    : [...prev, agent.id]
+                                );
+                              }}
+                              disabled={isLoading}
+                            />
+                          ))}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}
