@@ -3,10 +3,17 @@ import { config, getModel, getTool, getFikenMcpClient } from '../lib/config.js';
 import { RateLimitOptions, errorResponseBuilderContext } from '@fastify/rate-limit';
 import { ChatRequest, ChatRequestBody, ErrorResponse } from '../types/chat.js';
 
+import { requireAuth } from '../lib/auth.js';
+
 export const chatRoute: FastifyPluginAsync = async fastify => {
   fastify.post<{ Body: ChatRequest }>(
     '/api/chat',
     {
+      preHandler: async (request, reply) => {
+        const user = requireAuth(request, reply);
+        if (!user) return; // response sent by requireAuth
+        (request as any).user = user; // attach for downstream if needed
+      },
       config: {
         rateLimit: {
           max: 20,

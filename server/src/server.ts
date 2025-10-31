@@ -8,6 +8,7 @@ import Fastify from 'fastify';
 import { chatRoute } from './routes/chat.js';
 import { imagesRoute } from './routes/images.js';
 import { debugRoute } from './routes/debug.js';
+import { authRoute } from './routes/auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -43,6 +44,9 @@ fastify.register(imagesRoute);
 
 // Register debug route
 fastify.register(debugRoute);
+
+// Register auth routes
+fastify.register(authRoute);
 
 // Run the server
 const start = async () => {

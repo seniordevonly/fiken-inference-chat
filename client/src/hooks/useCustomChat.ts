@@ -54,6 +54,7 @@ export function useCustomChat({ model, reasoning, agents, historyLimit = 6 }: Us
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           messages: recentMessages,
           model,
